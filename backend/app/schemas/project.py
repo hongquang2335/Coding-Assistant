@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ProjectOut(BaseModel):
@@ -13,3 +13,21 @@ class ProjectOut(BaseModel):
 
 class ProjectListResponse(BaseModel):
     items: list[ProjectOut]
+
+
+class ProjectTreeNode(BaseModel):
+    name: str
+    path: str
+    type: str
+    children: list["ProjectTreeNode"] = Field(default_factory=list)
+
+
+class ProjectTreeResponse(BaseModel):
+    project_id: str
+    root: ProjectTreeNode
+
+
+class SourceFileResponse(BaseModel):
+    project_id: str
+    path: str
+    content: str
