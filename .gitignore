@@ -14,5 +14,4 @@ backend/storage/app.db
 !backend/storage/uploads/.gitkeep
 !backend/storage/extracted/.gitkeep
 
-frontend
 start.md
