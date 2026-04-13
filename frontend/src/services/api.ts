@@ -1,6 +1,7 @@
 import type {
   Project,
   ProjectListResponse,
+  ReviewResult,
   ProjectTreeNode,
   ProjectTreeResponse,
   SourceFileResponse
@@ -50,4 +51,44 @@ export async function fetchProjectSource(projectId: string, path: string): Promi
   }
   const data: SourceFileResponse = await response.json();
   return data.content;
+}
+
+type FetchReviewParams = {
+  projectId: string;
+  path: string;
+  targetName?: string | null;
+  targetType?: string | null;
+  startLine?: number | null;
+  endLine?: number | null;
+};
+
+export async function fetchProjectReview({
+  projectId,
+  path,
+  targetName,
+  targetType,
+  startLine,
+  endLine
+}: FetchReviewParams): Promise<ReviewResult> {
+  const params = new URLSearchParams({ path });
+  if (targetName) {
+    params.set("target_name", targetName);
+  }
+  if (targetType) {
+    params.set("target_type", targetType);
+  }
+  if (startLine) {
+    params.set("start_line", String(startLine));
+  }
+  if (endLine) {
+    params.set("end_line", String(endLine));
+  }
+
+  const response = await fetch(`${API_BASE}/api/projects/${projectId}/review?${params.toString()}`);
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null);
+    throw new Error(errorBody?.detail ?? "Failed to fetch review result.");
+  }
+
+  return response.json();
 }

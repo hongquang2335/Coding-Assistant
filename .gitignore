@@ -15,3 +15,5 @@ backend/storage/app.db
 !backend/storage/extracted/.gitkeep
 
 start.md
+plan.md
+Readme.md

@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi import HTTPException, status
 
 from app.core.db import get_conn
+from app.services.symbol_service import parse_python_symbols
 
 IGNORED_NAMES = {
     ".git",
@@ -77,14 +78,22 @@ def _build_node(path: Path, root: Path) -> dict | None:
             "name": path.name if path != root else root.name,
             "path": relative_path,
             "type": "directory",
+            "file_path": None,
+            "start_line": None,
+            "end_line": None,
             "children": children,
         }
+
+    children = parse_python_symbols(path, relative_path) if path.suffix.lower() == ".py" else []
 
     return {
         "name": path.name,
         "path": relative_path,
         "type": "file",
-        "children": [],
+        "file_path": relative_path,
+        "start_line": None,
+        "end_line": None,
+        "children": children,
     }
 
 
@@ -104,6 +113,9 @@ def build_project_tree(project_id: str) -> dict:
             "name": root.name,
             "path": ".",
             "type": "directory",
+            "file_path": None,
+            "start_line": None,
+            "end_line": None,
             "children": [],
         }
 

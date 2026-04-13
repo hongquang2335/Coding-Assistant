@@ -3,17 +3,17 @@ import type { ProjectTreeNode } from "../types/project";
 type ProjectExplorerProps = {
   root: ProjectTreeNode | null;
   selectedPath: string | null;
-  onSelectFile: (path: string) => void;
+  onSelectNode: (node: ProjectTreeNode) => void;
 };
 
 type TreeNodeProps = {
   node: ProjectTreeNode;
   depth: number;
   selectedPath: string | null;
-  onSelectFile: (path: string) => void;
+  onSelectNode: (node: ProjectTreeNode) => void;
 };
 
-function TreeNode({ node, depth, selectedPath, onSelectFile }: TreeNodeProps) {
+function TreeNode({ node, depth, selectedPath, onSelectNode }: TreeNodeProps) {
   const indent = { paddingLeft: `${depth * 14 + 10}px` };
 
   if (node.type === "directory") {
@@ -28,7 +28,7 @@ function TreeNode({ node, depth, selectedPath, onSelectFile }: TreeNodeProps) {
             node={child}
             depth={depth + 1}
             selectedPath={selectedPath}
-            onSelectFile={onSelectFile}
+            onSelectNode={onSelectNode}
           />
         ))}
       </div>
@@ -36,20 +36,22 @@ function TreeNode({ node, depth, selectedPath, onSelectFile }: TreeNodeProps) {
   }
 
   const isSelected = selectedPath === node.path;
+  const kindLabel = node.type === "file" ? "FILE" : node.type === "class" ? "CLASS" : "FUNC";
 
   return (
     <button
       type="button"
-      className={`tree-node tree-node-file${isSelected ? " selected" : ""}`}
+      className={`tree-node tree-node-item tree-node-${node.type}${isSelected ? " selected" : ""}`}
       style={indent}
-      onClick={() => onSelectFile(node.path)}
+      onClick={() => onSelectNode(node)}
     >
+      <span className="tree-node-kind">{kindLabel}</span>
       <span className="tree-node-label">{node.name}</span>
     </button>
   );
 }
 
-export function ProjectExplorer({ root, selectedPath, onSelectFile }: ProjectExplorerProps) {
+export function ProjectExplorer({ root, selectedPath, onSelectNode }: ProjectExplorerProps) {
   if (!root) {
     return <p className="placeholder">Select a project to load its extracted source tree.</p>;
   }
@@ -62,7 +64,7 @@ export function ProjectExplorer({ root, selectedPath, onSelectFile }: ProjectExp
           node={root}
           depth={0}
           selectedPath={selectedPath}
-          onSelectFile={onSelectFile}
+          onSelectNode={onSelectNode}
         />
       </div>
     </section>
